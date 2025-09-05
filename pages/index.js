@@ -1,12 +1,6 @@
 import { useEffect, useState } from "react";
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
-
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export default function Home() {
-  // ✅ Hooks must be inside the function component
   const [tweets, setTweets] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -14,22 +8,31 @@ export default function Home() {
     fetch("/api/tweets")
       .then((res) => res.json())
       .then((data) => {
-        setTweets(data.tweets || []);
+        setTweets(data.tweets);
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      });
   }, []);
 
-  if (loading) return <h2>Loading...</h2>;
+  if (loading) return <h2 className="text-white text-3xl text-center mt-20">Loading...</h2>;
 
   return (
-    <div className={`${geistSans.className} ${geistMono.className} font-sans p-8`}>
-      <h1>KiteAI Tweets Leaderboard</h1>
-      <ol>
+    <div className="min-h-screen bg-black text-white p-8 font-sans relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900 to-black animate-pulse -z-10"></div>
+
+      <h1 className="text-4xl font-bold text-center mb-8">KiteAI Tweets Leaderboard (24h)</h1>
+
+      <ol className="space-y-4 max-w-3xl mx-auto">
         {tweets.map((tweet, idx) => (
-          <li key={idx}>
-            <p>{tweet.text}</p>
-            <small>XP: {tweet.xp} | Score: {tweet.score}</small>
+          <li
+            key={idx}
+            className={`p-4 rounded-lg border border-gray-700 hover:border-white transition-colors ${
+              tweet.quality === "High" ? "bg-purple-900 animate-pulse" : "bg-gray-800"
+            }`}
+          >
+            <p className="text-white">{tweet.text}</p>
+            <small className="text-gray-400">
+              XP: {tweet.xp} | Quality: {tweet.quality} | Author: {tweet.author}
+            </small>
           </li>
         ))}
       </ol>
